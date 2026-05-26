@@ -1,0 +1,4 @@
+The 17th byte overwrites only the LSB of the saved RBP — not the return address directly.
+When do_copy() returns, main() restores the corrupted RBP. Its own 'ret' then reads an address from the wrong stack location.
+Use gdb with 'stepi' and 'info registers' to watch rsp and rbp shift during the two nested returns.
+The byte you inject should be the low byte of secret()'s address. Find it with: nm target | grep secret

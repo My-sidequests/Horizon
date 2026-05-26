@@ -1,0 +1,28 @@
+Exercise 03 — GDB Crash Analysis
+===================================
+
+The program crashes with a segmentation fault when you run it.
+Something, somewhere, goes wrong.
+
+Your goal: use GDB to identify exactly where the crash happens
+and why. No [SUCCESS] flag this time — understanding is the goal.
+
+  Run it normally first:
+    ./target
+
+  Then load it in GDB and run:
+    gdb ./target
+    run
+
+  When it crashes, GDB catches it. Inspect the state:
+    backtrace
+    frame 0
+    info registers
+    list
+
+  Answer these questions:
+    - Which function caused the crash?
+    - Which line?
+    - What is the value of the pointer being dereferenced?
+
+When you can answer all three AND have read the flag with GDB, submit it: horizon done HRZ{...}

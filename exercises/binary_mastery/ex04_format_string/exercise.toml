@@ -1,0 +1,47 @@
+[exercise]
+number      = 4
+name        = "Format String Attack"
+module      = "Binary Mastery — Memory Corruption"
+verify_mode = "auto"
+
+description = """
+No overflow this time. Instead, a developer bad habit:
+passing user input directly to printf() with no format string.
+This lets you force the program to read or write anywhere in its own memory."""
+
+objective = """
+Use the format string vulnerability to overwrite the global variable
+secret_key with the value 0x1337, triggering the success condition."""
+
+steps = [
+    "Compile: gcc -no-pie -o horizon_04 horizon_04.c",
+    "Find the address of secret_key: nm horizon_04 | grep secret_key",
+    "Leak the stack with %p tokens to find which argument index holds your input:",
+    "  python3 -c \"print('AAAA' + '.%p'*20)\" | ./horizon_04",
+    "  Look for 0x41414141 (AAAA) in the output — that's your index.",
+    "Use %Nc$n to write N (= 0x1337 = 4919) characters at the address of secret_key:",
+    "  Craft: [address as 8 bytes] + padding to reach 4919 chars + %INDEX$n",
+    "  python3 exploit_04.py | ./horizon_04",
+]
+
+[compile]
+source = "horizon_04.c"
+output = "horizon_04"
+flags  = ["-no-pie"]
+
+[[hints]]
+text = """printf() treats your input as a format string.
+%p reads a pointer from the stack and prints it.
+Chain many %p to dump the stack and spot your input buffer's position."""
+
+[[hints]]
+text = """%n is the key specifier: it writes the number of characters printed so far
+into the address pointed to by the corresponding argument on the stack.
+It does not print anything — it writes to memory."""
+
+[[hints]]
+text = """Workflow:
+1. Find index I where your 8-byte address appears via the %p leak.
+2. Build payload: [8-byte little-endian address of secret_key] + [padding] + %I$n
+3. Padding length = 4919 - 8 (already printed by the address itself).
+pwntools' fmtstr_payload() automates all of this if you want to verify your understanding."""

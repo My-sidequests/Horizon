@@ -1,0 +1,24 @@
+Exercise 01 — GDB Basics
+==========================
+
+The binary runs and prints nothing useful.
+Somewhere inside it, a function called success() prints the flag.
+It is never called in the normal control flow.
+
+Your goal: use GDB to call success() directly.
+
+  Load the binary in GDB:
+    gdb ./target
+
+  List all functions in the binary:
+    info functions
+
+  Call success() without running the program normally:
+    call (void) success()
+
+  Or: set a breakpoint, run, then jump to it:
+    break main
+    run
+    jump success
+
+Call success() to reveal the flag, then submit it: horizon done HRZ{...}

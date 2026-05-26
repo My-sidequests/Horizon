@@ -1,0 +1,50 @@
+[exercise]
+number      = 5
+name        = "Return-to-libc (NX Bypass)"
+module      = "Binary Mastery — Memory Corruption"
+verify_mode = "manual"
+
+description = """
+The final boss. NX (No-Execute) is active: the stack is not executable.
+Shellcode injection (ex02) is now blocked.
+Instead, you will reuse legitimate code already loaded by the C standard library."""
+
+objective = """
+Overwrite the return address to call system(\"/bin/sh\") — or a custom
+command — by chaining three addresses: system(), exit(), and \"/bin/sh\"."""
+
+steps = [
+    "Compile (NX on, no PIE, no stack canary):",
+    "  gcc -fno-stack-protector -no-pie -o horizon_05 horizon_05.c",
+    "Find the three required addresses using gdb:",
+    "  p system            → address of system()",
+    "  p exit              → address of exit()",
+    "  find &system, +9999999, \"/bin/sh\" → address of the \"/bin/sh\" string in libc",
+    "Calculate padding (buffer + saved RBP): inspect do_overflow() frame.",
+    "Build the payload: [padding] + [system addr] + [exit addr] + [\"/bin/sh\" addr]",
+    "  python3 exploit_05.py | ./horizon_05",
+    "You get a shell — run 'echo [SUCCESS]' inside it, then press [v].",
+]
+
+[compile]
+source = "horizon_05.c"
+output = "horizon_05"
+flags  = ["-fno-stack-protector", "-no-pie"]
+
+[[hints]]
+text = """On x86_64, function arguments go in registers (rdi, rsi, rdx...), not on the stack.
+To call system(addr_of_string), you need to load the string address into rdi first.
+You need a 'pop rdi ; ret' gadget — find one with: ROPgadget --binary horizon_05"""
+
+[[hints]]
+text = """Full x86_64 ret2libc chain:
+  [padding] + [pop_rdi gadget] + [addr of \"/bin/sh\"] + [addr of system] + [addr of exit]
+The gadget pops the top of stack (\"/bin/sh\" address) into rdi, then rets into system()."""
+
+[[hints]]
+text = """Finding \"/bin/sh\" in libc with Python:
+  import ctypes
+  libc = ctypes.CDLL("libc.so.6")
+  # In gdb: info proc mappings → find libc base → search manually
+  # Or: python3 -c \"import subprocess; ...\"
+  # Easiest: gdb → find &__libc_start_main,+99999999,\"/bin/sh\""""

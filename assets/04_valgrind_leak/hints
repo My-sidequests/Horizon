@@ -1,0 +1,4 @@
+Valgrind intercepts every malloc and free call. At exit, it reports anything allocated but not freed.
+Look for the "LEAK SUMMARY" section at the bottom of the output — it gives totals at a glance.
+"definitely lost: N bytes in M blocks" means those allocations have no pointer left pointing to them.
+Each leak entry shows a stack trace of where the memory was allocated — the line numbers point directly to the bug.

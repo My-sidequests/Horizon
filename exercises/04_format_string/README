@@ -1,0 +1,24 @@
+Exercise 04 — Format String Attack
+=====================================
+
+No overflow this time.
+User input is passed directly to printf() without a format string.
+This lets you read and write arbitrary memory.
+
+A global variable `secret` holds the value 0x4242.
+Change it to 0x1337 to win.
+
+  Compile:
+    gcc -no-pie -o target target.c
+
+  Find the address of secret:
+    nm target | grep secret
+
+  Leak the stack with %p to find your input's position:
+    python3 -c "print('AAAA' + '.%p' * 20)" | ./target
+    Look for 0x41414141 in the output — that index is yours.
+
+  Write 0x1337 (4919) to the address of secret using %n:
+    [8-byte address of secret] + [padding] + %INDEX$n
+
+When you see [SUCCESS], run `horizon done`.

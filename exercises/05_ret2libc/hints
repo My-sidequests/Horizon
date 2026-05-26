@@ -1,0 +1,4 @@
+On x86_64, the first argument to a function goes in rdi. system() expects a char* in rdi. You must control rdi before calling system().
+A 'pop rdi ; ret' gadget pops the top of the stack into rdi, then returns. Put your "/bin/sh" address right after it in the payload.
+Find gadgets with: ROPgadget --binary target | grep "pop rdi". There's usually one in the binary itself when compiled with -no-pie.
+If the stack isn't 16-byte aligned before system() is called, it will segfault on movaps. Add a bare 'ret' gadget before system() to realign.

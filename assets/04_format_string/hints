@@ -1,0 +1,4 @@
+%p reads a value from the stack and prints it as a pointer. Chain many %p tokens to dump the stack and locate your input.
+Find your input's position: send 'AAAA' + '.%p' * 20 and look for 0x41414141 in the output. That index is yours.
+%n writes the number of characters printed so far to the address held by its stack argument. It does not print anything.
+Payload shape: [8-byte LE address of secret] + ['A' * (0x1337 - 8)] + '%INDEX$n'. pwntools' fmtstr_payload() automates this.

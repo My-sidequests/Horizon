@@ -1,0 +1,50 @@
+[exercise]
+number      = 2
+name        = "Shellcode Injection"
+module      = "Binary Mastery — Memory Corruption"
+verify_mode = "manual"
+
+description = """
+There is no target function in the binary this time.
+You must inject your own machine code (shellcode) into the buffer
+and redirect the return address to execute it.
+The stack is made executable via -z execstack."""
+
+objective = """
+Inject shellcode that prints [SUCCESS] into the buffer,
+then overwrite the return address to jump to it."""
+
+steps = [
+    "Compile: gcc -fno-stack-protector -z execstack -no-pie -o horizon_02 horizon_02.c",
+    "Find the approximate address of the buffer using gdb/lldb:",
+    "  gdb ./horizon_02 → break vulnerable → run → p &buffer",
+    "Build your payload: [NOP sled] + [shellcode] + [padding] + [buffer address]",
+    "Shellcode must call write(1, \"[SUCCESS]\\n\", 10) — see hints for details.",
+    "Launch: python3 exploit_02.py | ./horizon_02",
+    "When you see [SUCCESS], press [v] to validate.",
+]
+
+[compile]
+source = "horizon_02.c"
+output = "horizon_02"
+flags  = ["-fno-stack-protector", "-z", "execstack", "-no-pie"]
+
+[[hints]]
+text = """A NOP sled (repeated \\x90 bytes) placed before your shellcode widens the landing zone.
+You can aim anywhere in the sled — you don't need the exact start address."""
+
+[[hints]]
+text = """Minimal x86_64 Linux shellcode calling write(1, \"[SUCCESS]\\n\", 10):
+  \\x48\\xc7\\xc0\\x01\\x00\\x00\\x00   mov rax, 1   (syscall: write)
+  \\x48\\xc7\\xc7\\x01\\x00\\x00\\x00   mov rdi, 1   (fd: stdout)
+  [lea rsi, [rip + offset]]          point rsi at your \"[SUCCESS]\" string
+  \\x48\\xc7\\xc2\\x0a\\x00\\x00\\x00   mov rdx, 10  (length)
+  \\x0f\\x05                          syscall"""
+
+[[hints]]
+text = """pwntools makes shellcode trivial:
+  from pwn import *
+  context.arch = 'amd64'
+  sc = shellcraft.write(1, '[SUCCESS]\\n', 10)
+  shellcode = asm(sc)
+It handles all encoding and architecture details for you."""

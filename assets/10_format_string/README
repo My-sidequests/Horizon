@@ -1,0 +1,13 @@
+Exercise 04 — Format String Attack
+=====================================
+
+No overflow this time.
+User input is passed directly to printf() without a format specifier.
+
+When printf() sees %p or %x in your input, it reads values off the
+stack. When it sees %n, it writes to memory.
+
+A global variable 'secret' holds 0x4242.
+You need to change it to 0x1337.
+
+Your goal: overwrite secret using the format string vulnerability.

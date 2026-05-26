@@ -1,0 +1,4 @@
+Run the program first without GDB to see the raw crash: ./target — note the "Segmentation fault" message.
+Inside GDB, after the crash, 'backtrace' (or 'bt') shows the full call stack from main down to the crash point.
+'frame N' switches to frame N from the backtrace. 'frame 0' is where the crash happened. 'list' shows the source lines around it.
+'info registers' shows the CPU state at crash time. Look at rip (instruction pointer) and the argument registers.

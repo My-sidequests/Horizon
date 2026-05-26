@@ -1,0 +1,21 @@
+Exercise 02 — Shellcode Injection
+===================================
+
+There is no win() function this time.
+You must inject your own machine code into the buffer
+and redirect execution to it.
+
+The stack is executable (-z execstack).
+
+  Compile:
+    gcc -fno-stack-protector -z execstack -no-pie -o target target.c
+
+  Find the buffer address:
+    gdb ./target → break vulnerable → run → p &buffer
+
+  Build your payload:
+    [NOP sled \x90 ...] + [shellcode] + [padding] + [buffer address]
+
+  Your shellcode must call write(1, "[SUCCESS]\n", 10).
+
+When you see [SUCCESS], run `horizon done`.

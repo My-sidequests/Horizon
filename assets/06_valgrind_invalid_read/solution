@@ -1,0 +1,39 @@
+Solution — Exercise 06: Valgrind Invalid Read
+===============================================
+
+Step 1: Run with Valgrind
+  valgrind --leak-check=full ./target
+
+Step 2: Read the report
+  Invalid read of size 4
+    at sum_array (target.c:15)     ← total += arr[i++] when i == 5
+    by main (target.c:29)
+    Address is 0 bytes after a block of size 20 alloc'd
+    at malloc (vg_replace_malloc.c:...)
+    by main (target.c:21)
+
+Answers:
+  - Distance past allocation: 0 bytes after the end (i.e. the very next word)
+  - Line: 15 — the loop body executing when i == 5
+  - Correct condition: i < size (not i <= size)
+
+The fix:
+  while (i < size)
+    total += arr[i++];
+
+Why it matters:
+  Buffer overreads are silent at runtime — the program often produces
+  a plausible result and exits cleanly. But reading past a buffer can
+  leak adjacent memory contents: other variables, heap metadata,
+  or even sensitive data like keys or passwords.
+  This is exactly the class of bug behind the Heartbleed vulnerability (CVE-2014-0160).
+
+Step 3: Read the flag with GDB
+  The flag is a static variable inside sum_array().
+  gdb ./target
+  (gdb) break sum_array
+  (gdb) run
+  (gdb) print flag
+  → $1 = "HRZ{one_too_many}"
+
+  Submit it: horizon done HRZ{one_too_many}

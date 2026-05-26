@@ -1,0 +1,10 @@
+Exercise 01 — Return-Oriented Hijacking
+========================================
+
+A program reads your input from stdin into a 16-byte stack buffer.
+The read() call accepts up to 128 bytes — no bounds check.
+
+The function win() exists in the binary but is never called in the
+normal control flow.
+
+Your goal: make win() execute.

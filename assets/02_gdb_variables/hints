@@ -1,0 +1,4 @@
+'break main' + 'run' stops execution at the first line of main, before any code runs.
+'next' steps one line forward. Keep stepping until you're past the 'int key = 0' line.
+'print key' shows the current value. 'set variable key = 0x1337' overwrites it in memory.
+'continue' (or 'c') resumes execution until the next breakpoint or the program exits.

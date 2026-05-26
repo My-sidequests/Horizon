@@ -1,0 +1,21 @@
+Exercise 05 — Valgrind: Use-After-Free
+=========================================
+
+The program frees a struct, then keeps using it.
+This is a use-after-free bug — one of the most exploited
+vulnerability classes in real-world software.
+
+It may not crash. It may print plausible-looking values.
+That is what makes it dangerous.
+
+Your goal: use Valgrind to detect and understand the bug.
+
+  Run with Valgrind:
+    valgrind --leak-check=full ./target
+
+  Answer these questions:
+    - What does Valgrind call this type of error?
+    - At which line does the invalid access occur?
+    - Why might this bug be silent without Valgrind?
+
+When you can answer all three AND have read the flag with GDB, submit it: horizon done HRZ{...}

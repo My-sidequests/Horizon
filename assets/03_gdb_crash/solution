@@ -1,0 +1,48 @@
+Solution — Exercise 03: GDB Crash Analysis
+============================================
+
+Step 1: Observe the crash
+  ./target
+  → Segmentation fault (core dumped)
+
+Step 2: Load in GDB and run
+  gdb ./target
+  (gdb) run
+  → Program received signal SIGSEGV, Segmentation fault.
+  → in process (data=0x0) at target.c:10
+
+Step 3: Read the backtrace
+  (gdb) backtrace
+  → #0  process (data=0x0) at target.c:10
+  → #1  load_data (count=0) at target.c:19
+  → #2  main () at target.c:25
+
+Step 4: Examine the crash frame
+  (gdb) frame 0
+  (gdb) list
+  → line 10: printf("First value: %d\n", *data);
+  (gdb) print data
+  → $1 = (int *) 0x0   ← NULL pointer
+
+Answers:
+  - Function: process()
+  - Line: 10 (*data is dereferenced)
+  - Pointer value: 0x0 (NULL)
+
+Root cause:
+  load_data() only allocates memory when count > 0.
+  When called with 0, data stays NULL.
+  process() blindly dereferences it — crash.
+
+Why it matters:
+  Backtrace + frame inspection is how you diagnose crashes in real code.
+  In the exploitation exercises ahead, you will deliberately cause crashes
+  and use the same tools to understand exactly what you control.
+
+Step 5: Read the hidden flag
+  The flag is stored as a static variable inside process().
+  After the crash, you are already in frame 0:
+  (gdb) print flag
+  → $1 = "HRZ{null_speaks}"
+
+  Submit it: horizon done HRZ{null_speaks}

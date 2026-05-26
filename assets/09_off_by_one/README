@@ -1,0 +1,12 @@
+Exercise 03 — Off-by-One
+==========================
+
+A loop uses <= instead of <.
+It copies 17 bytes into a 16-byte buffer — one byte too many.
+
+That single extra byte lands on the saved RBP, corrupting
+its least-significant byte (LSB).
+
+The function secret() exists but is never called.
+
+Your goal: control that 17th byte to redirect execution to secret().

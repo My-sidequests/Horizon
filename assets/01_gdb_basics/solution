@@ -1,0 +1,24 @@
+Solution — Exercise 01: GDB Basics
+=====================================
+
+Step 1: Load the binary
+  gdb ./target
+
+Step 2: Discover what's inside
+  (gdb) info functions
+  → you will see: success, decoy_a, decoy_b, decoy_c, main
+
+Step 3: Call success() directly
+  (gdb) call (void) success()
+  → [SUCCESS] You called a hidden function. GDB obeys you now.
+
+Alternative approach:
+  (gdb) break main
+  (gdb) run
+  (gdb) jump success
+  → execution jumps to success() instead of continuing main
+
+Why it matters:
+  GDB gives you complete control over a running process.
+  You can call any function, modify any variable, redirect execution.
+  This is the foundation of everything that follows in Horizon.

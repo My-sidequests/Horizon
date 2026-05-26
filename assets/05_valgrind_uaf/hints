@@ -1,0 +1,4 @@
+Valgrind reports use-after-free as "Invalid read" or "Invalid write" with a note: "Address is 0 bytes inside a block of size N free'd".
+The stack trace shows two locations: where the bad access happened, and where the memory was originally freed.
+Without Valgrind, the freed memory often still contains the old data — the bug appears harmless. The allocator just marks it reusable.
+In exploitation, use-after-free means controlling what gets allocated in that freed slot next — making the "harmless" bug into arbitrary code execution.

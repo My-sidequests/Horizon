@@ -1,0 +1,3 @@
+Start with: gdb ./target — then type 'info functions' to see everything inside the binary.
+'call (void) success()' executes a function directly from the GDB prompt, no breakpoint needed.
+Alternatively: 'break main' → 'run' → 'jump success' redirects execution mid-run.

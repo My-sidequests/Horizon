@@ -1,0 +1,30 @@
+Solution — Exercise 02: GDB Variables
+========================================
+
+Step 1: Load and break at main
+  gdb ./target
+  (gdb) break main
+  (gdb) run
+  → stops at the first line of main
+
+Step 2: Step to after 'key' is initialized
+  (gdb) next
+  → int key = 0 executes
+  (gdb) print key
+  → $1 = 0
+
+Step 3: Overwrite the variable
+  (gdb) set variable key = 0x1337
+  (gdb) print key
+  → $2 = 4919   (which is 0x1337)
+
+Step 4: Resume
+  (gdb) continue
+  → Key is: 0
+  → [SUCCESS] You changed the key. Variables bend to your will.
+
+Why it matters:
+  GDB can read and write any variable in a running process.
+  Combined with breakpoints, this gives you complete control
+  over a program's state — exactly what you need for debugging
+  and for the exploitation exercises ahead.

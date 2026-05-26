@@ -1,0 +1,41 @@
+Solution — Exercise 05: Valgrind Use-After-Free
+=================================================
+
+Step 1: Run with Valgrind
+  valgrind --leak-check=full ./target
+
+Step 2: Read the report
+  Invalid read of size 4
+    at main (target.c:27)       ← printf("Value after free: %d\n", node->value)
+    Address is 0 bytes inside a block of size 48 free'd
+    at free (vg_replace_malloc.c:...)
+    by main (target.c:24)       ← free(node)
+
+  Invalid write of size 4
+    at main (target.c:28)       ← node->value = 99
+    Address is 0 bytes inside a block of size 48 free'd
+
+Answers:
+  - Error type: "Invalid read" / "Invalid write" (use-after-free)
+  - Lines: 27 (read) and 28 (write), after free() on line 24
+  - Why silent: freed memory isn't zeroed — old data remains readable
+    until the allocator reuses the block for something else
+
+Why it matters:
+  Use-after-free is one of the most exploited bug classes.
+  An attacker can arrange for a controlled allocation to fill
+  the freed slot — turning a dangling pointer into a code
+  execution primitive. CVEs built on this class include
+  major browser, kernel, and OS vulnerabilities.
+
+Step 3: Read the flag with GDB
+  The flag is stored in node->label. Even after free(), the memory
+  is not zeroed — the string remains readable.
+  gdb ./target
+  (gdb) break main
+  (gdb) run
+  (gdb) next    (step past strcpy)
+  (gdb) print node->label
+  → $1 = "HRZ{dangling_ptr}"
+
+  Submit it: horizon done HRZ{dangling_ptr}

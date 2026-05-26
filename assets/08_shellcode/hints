@@ -1,0 +1,4 @@
+A NOP sled (\x90 repeated) before your shellcode widens the landing zone — you don't need the exact start address of the buffer.
+x86_64 write syscall: rax=1, rdi=1, rsi=ptr to string, rdx=length, then the 'syscall' instruction (\x0f\x05).
+pwntools handles all the encoding: from pwn import *; context.arch = 'amd64'; sc = asm(shellcraft.write(1, '[SUCCESS]\n', 10))
+Payload shape: [NOP sled] + [shellcode] + [padding to reach return addr] + [address somewhere in your NOP sled].

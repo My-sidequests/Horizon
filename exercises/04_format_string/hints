@@ -1,0 +1,4 @@
+%p reads a value from the stack and prints it as a pointer. Chain many %p to dump the stack and find your input's position.
+%n writes the number of characters printed so far into the address held by the matching argument. It doesn't print — it writes.
+Your payload: [little-endian address of secret, 8 bytes] + ['A' * (4919 - 8)] + '%INDEX$n'. The address itself counts as 8 printed chars.
+pwntools automates the whole thing: from pwn import *; fmtstr_payload(index, {addr_of_secret: 0x1337})

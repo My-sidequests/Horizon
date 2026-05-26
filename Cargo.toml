@@ -1,0 +1,15 @@
+[package]
+name    = "horizon"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "horizon"
+path = "src/main.rs"
+
+[dependencies]
+clap       = { version = "=4.4.18", features = ["derive"] }
+colored    = "=2.1.0"
+dirs       = "=5.0.1"
+serde      = { version = "=1.0.197", features = ["derive"] }
+serde_json = "=1.0.114"

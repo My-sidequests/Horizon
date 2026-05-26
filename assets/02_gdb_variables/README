@@ -1,0 +1,24 @@
+Exercise 02 — GDB Variables
+==============================
+
+The program checks whether a local variable 'key' equals 0x1337.
+It is initialized to 0 and never changed in the source code.
+
+Your goal: use GDB to change 'key' to 0x1337 before the check runs.
+
+  Load and break at main:
+    gdb ./target
+    break main
+    run
+
+  Step through until key is in scope, then inspect it:
+    next
+    print key
+
+  Change it:
+    set variable key = 0x1337
+
+  Continue execution:
+    continue
+
+Change the key to reveal the flag, then submit it: horizon done HRZ{...}

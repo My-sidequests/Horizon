@@ -1,0 +1,4 @@
+The 17th byte overwrites only the least-significant byte (LSB) of the saved RBP — not the return address directly.
+When the function returns, main() restores the corrupted RBP. Its own 'ret' then reads a return address from the wrong stack location.
+Step through the return sequence in gdb with `stepi` and watch `info registers` — you'll see RBP shift, then RIP jump somewhere unexpected.
+The byte you inject should be the low byte of secret()'s address. If secret is at 0x401130, try 0x30.

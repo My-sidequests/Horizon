@@ -1,0 +1,4 @@
+An "Invalid read of size 4" means 4 bytes (one int) were read from outside a valid allocation.
+Valgrind will say "Address is N bytes after a block of size M alloc'd" — N tells you how far past the end the read went.
+The bug is in the loop condition: 'i <= size' iterates for i = 0, 1, 2, 3, 4, 5 — that's 6 reads into a 5-element array.
+The correct condition is 'i < size'. This is the same class of bug as Exercise 09 (Off-by-One) — seen from the defender's side.

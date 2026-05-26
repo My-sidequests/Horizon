@@ -1,0 +1,28 @@
+Exercise 05 — Return-to-libc (NX Bypass)
+==========================================
+
+The stack is no longer executable. Shellcode injection is dead.
+
+Instead, you will reuse code already in memory:
+chain the address of system() with the address of "/bin/sh"
+to get a shell — without writing a single byte of shellcode.
+
+  Compile (NX on by default, no canary, no PIE):
+    gcc -fno-stack-protector -no-pie -o target target.c
+
+  Find the three addresses you need (in gdb):
+    p system                              → address of system()
+    p exit                                → address of exit()
+    find &system,+9999999,"/bin/sh"       → address of "/bin/sh" in libc
+
+  On x86_64, arguments go in registers, not on the stack.
+  You need a 'pop rdi ; ret' gadget to load "/bin/sh" into rdi:
+    ROPgadget --binary target | grep "pop rdi"
+
+  Payload layout:
+    [padding] + [pop_rdi gadget] + [addr of "/bin/sh"] + [addr of system] + [addr of exit]
+
+  Once you have a shell, run:
+    echo [SUCCESS]
+
+Then run `horizon done`.

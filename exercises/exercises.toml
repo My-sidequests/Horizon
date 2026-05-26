@@ -1,0 +1,9 @@
+# Exercises in progression order.
+# Add relative paths here to extend Horizon with new modules.
+exercises = [
+    "binary_mastery/ex01_return_oriented",
+    "binary_mastery/ex02_shellcode",
+    "binary_mastery/ex03_off_by_one",
+    "binary_mastery/ex04_format_string",
+    "binary_mastery/ex05_ret2libc",
+]

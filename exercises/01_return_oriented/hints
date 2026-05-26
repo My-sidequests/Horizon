@@ -1,0 +1,4 @@
+The overflow overwrites memory in this order: buffer → saved RBP → return address. You need to reach the return address.
+Padding = buffer size + 8 bytes (saved RBP). The buffer here is 16 bytes, so try 24 bytes of 'A' first.
+64-bit addresses are little-endian: 0x401140 → \x40\x11\x40\x00\x00\x00\x00\x00. struct.pack('<Q', addr) handles this automatically.
+Use stdin instead of argv so null bytes in the address are passed cleanly to the program.

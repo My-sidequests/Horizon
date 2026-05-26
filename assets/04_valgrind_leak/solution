@@ -1,0 +1,46 @@
+Solution — Exercise 04: Valgrind Memory Leak
+=============================================
+
+Step 1: Run with Valgrind
+  valgrind --leak-check=full --track-origins=yes ./target
+
+Step 2: Read the output
+  Valgrind will report something like:
+
+  6 bytes in 1 blocks are definitely lost
+    at malloc (vg_replace_malloc.c:...)
+    by create_message (target.c:10)
+    by main (target.c:18)        ← char *b = create_message("world")
+
+  7 bytes in 1 blocks are definitely lost
+    at malloc (vg_replace_malloc.c:...)
+    by create_message (target.c:10)
+    by main (target.c:19)        ← char *c = create_message("horizon")
+
+  LEAK SUMMARY:
+    definitely lost: 13 bytes in 2 blocks
+
+Answers:
+  - Bytes leaked: 13 (6 for "world" + 7 for "horizon")
+  - Allocations leaked: 2
+  - Lines: 18 and 19 in main (b and c are never freed)
+
+The fix:
+  free(b);
+  free(c);
+
+Why it matters:
+  Memory leaks are invisible at runtime — the program appears correct.
+  In long-running processes, leaked memory accumulates until the system
+  runs out. Valgrind makes the invisible visible.
+
+Step 3: Find the flag with GDB
+  The flag lives in the leaked 'flag' pointer inside main().
+  gdb ./target
+  (gdb) break main
+  (gdb) run
+  (gdb) next    (repeat until past 'char *flag = create_message(...)')
+  (gdb) print flag
+  → $1 = 0x... "HRZ{leak_found}"
+
+  Submit it: horizon done HRZ{leak_found}

@@ -1,0 +1,21 @@
+Exercise 04 — Valgrind: Memory Leak
+======================================
+
+The program runs and prints output without crashing.
+But it leaks memory — some allocations are never freed.
+
+Your goal: use Valgrind to find which allocations leak and why.
+
+  Run with Valgrind:
+    valgrind --leak-check=full --track-origins=yes ./target
+
+  Read the output carefully:
+    - "definitely lost" means memory that can never be freed
+    - The report shows the allocation site (file + line number)
+
+  Answer these questions:
+    - How many bytes are leaked?
+    - How many allocations are leaked?
+    - Which lines in the source caused the leaks?
+
+When you can answer all three AND have found the flag with GDB, submit it: horizon done HRZ{...}

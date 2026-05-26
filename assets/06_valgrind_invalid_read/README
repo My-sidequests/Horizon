@@ -1,0 +1,21 @@
+Exercise 06 — Valgrind: Invalid Read
+=======================================
+
+A function sums an integer array.
+There is an off-by-one error in the loop condition.
+The loop reads one element past the end of the allocation.
+
+The program will likely print a sum and exit without crashing.
+The extra read pulls a random value from memory beyond the array.
+
+Your goal: use Valgrind to catch the overread.
+
+  Run with Valgrind:
+    valgrind --leak-check=full ./target
+
+  Answer these questions:
+    - How many bytes past the allocation does the invalid read occur?
+    - Which line causes it?
+    - What is the correct loop condition?
+
+When you can answer all three AND have found the flag with GDB, submit it: horizon done HRZ{...}

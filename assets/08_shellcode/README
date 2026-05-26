@@ -1,0 +1,11 @@
+Exercise 02 — Shellcode Injection
+===================================
+
+There is no win() function this time.
+You must inject your own machine code into the buffer
+and redirect the return address to execute it.
+
+The stack has been made executable (-z execstack).
+The buffer is 64 bytes. read() accepts up to 256.
+
+Your goal: inject shellcode that prints [SUCCESS] and execute it.

@@ -1,0 +1,12 @@
+Exercise 05 — Return-to-libc (NX Bypass)
+==========================================
+
+The stack is no longer executable.
+Injecting shellcode (exercise 02) is now blocked by the CPU.
+
+Instead, you will reuse code already loaded in memory.
+The C standard library (libc) contains system() and the
+string "/bin/sh" — all you need for a shell.
+
+Your goal: call system("/bin/sh") by chaining existing addresses.
+Once you have a shell, run: echo [SUCCESS]
